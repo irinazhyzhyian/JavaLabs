@@ -3,7 +3,6 @@ package main.lab3.service;
 import main.lab3.model.CountMedicine;
 import main.lab3.model.Medicine;
 import main.lab3.model.Pharmacy;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,11 +31,7 @@ public class PharmacyService {
      */
     public List<Medicine> getListMedicine() {
         List<Medicine> result = new ArrayList<>();
-
-        pharmacy.getCountMedicines()
-                .stream()
-                .forEach(e -> result.add(e.getMedicine()));
-
+        pharmacy.getCountMedicines().forEach(e -> result.add(e.getMedicine()));
         return result;
     }
 
@@ -57,11 +52,6 @@ public class PharmacyService {
         List<CountMedicine> countMedicine = new LinkedList<>(pharmacy.getCountMedicines());
         countMedicine.sort(Comparator.comparingInt(CountMedicine::getCount).reversed());
         return countMedicine;
-       /* return pharmacy.getCountMedicines()
-                       .stream()
-                       .sorted(CountMedicine::compareTo)
-                       .collect(Collectors.toList());
-        */
     }
 
     /**
@@ -77,13 +67,16 @@ public class PharmacyService {
     }
 
     /**
-     * @param med is a Medicine
      * @return true if medicine isn`t overdue
      */
-    public boolean checkOverdueDay(Medicine med) {
-        List<Medicine> listMedicine = this.getListMedicine();
-        return listMedicine.stream()
-                            .anyMatch(a -> a.equals(med) && LocalDate.now().isBefore(a.getOverdueDay()));
+    private List<CountMedicine> getListOfOverdueMedicine() {
+        return pharmacy.getCountMedicines()
+                       .stream().filter(a-> new MedicineService(a.getMedicine()).checkOverdueDay())
+                       .collect(Collectors.toList());
+    }
+
+    public boolean removeOverdueMedicine() {
+       return pharmacy.getCountMedicines().removeAll(getListOfOverdueMedicine());
     }
 
     /**
@@ -93,17 +86,21 @@ public class PharmacyService {
      */
     public boolean sellMedicine(Medicine med, Integer count) {
         return pharmacy.getCountMedicines().stream()
-                .anyMatch(
-                          a-> {
-                              if(a.getMedicine().equals(med) && LocalDate.now().isBefore(a.getMedicine().getOverdueDay())&& a.getCount()>=count) {
-                                  a.setCount(a.getCount() - count);
-                                  return true;
-                              }
-                              else
-                                  return false;
-                          }
-                );
+                       .filter(a->a.getMedicine().equals(med))
+                       .collect(Collectors.toList())
+                       .stream()
+                 .anyMatch(
+                         a-> {
+                             if( a.getCount()>=count&& !(new MedicineService(a.getMedicine()).checkOverdueDay())) {
+                                 a.setCount(a.getCount() - count);
+                                 return true;
+                             }
+                             else
+                                 return false;
+                         }
+                 );
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -124,5 +121,5 @@ public class PharmacyService {
                 "pharmacy=" + pharmacy +
                 '}';
     }
-
+    public static void main(String[] args) { }
 }

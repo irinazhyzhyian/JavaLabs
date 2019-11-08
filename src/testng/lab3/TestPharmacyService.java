@@ -14,24 +14,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 public class TestPharmacyService {
-    List<Medicine> arrayMedicine = new ArrayList<>();
-    List<CountMedicine> count_med = new ArrayList<>();
-    Pharmacy pharmacy = new Pharmacy();
-    PharmacyService pharmacyService = new PharmacyService();
+
+   private List<Medicine> arrayMedicine = new ArrayList<>();
+   private List<CountMedicine> count_med = new ArrayList<>();
+    private PharmacyService pharmacyService = new PharmacyService();
 
     @BeforeTest
     public void before() {
         arrayMedicine.add(new Medicine("Парацетамол", "таблетки", 80.00, LocalDate.of(2019, 12, 1)));
         arrayMedicine.add(new Medicine("Парацетамол", "каплі", 81.00, LocalDate.of(2019, 12, 1)));
-        arrayMedicine.add(new Medicine("Називін", "каплі назальні", 55.00, LocalDate.now()));
+        arrayMedicine.add(new Medicine("Називін", "каплі назальні", 55.00, LocalDate.of(2019, 1, 1)));
         for (int i = 0; i < arrayMedicine.size(); i++)
             count_med.add(new CountMedicine(arrayMedicine.get(i), (i + 10) * 50));
 
 
         Person person = new Person.Builder().build();
-        pharmacy = new Pharmacy.Builder().setName("Pharmacy #1")
+        Pharmacy pharmacy = new Pharmacy.Builder().setName("Pharmacy #1")
                 .setPharmacist(person)
                 .setCountMedicines(count_med)
                 .build();
@@ -41,19 +42,6 @@ public class TestPharmacyService {
     @Test
     public void getListMedicineTest() {
         assertEquals(pharmacyService.getListMedicine(), arrayMedicine);
-    }
-
-    @Test(dataProvider = "findMedicineByNameProvider")
-    public void findMedicineByNameTest(List<CountMedicine> actual, List<CountMedicine> expected) {
-        assertEquals(actual, expected);
-    }
-
-    @DataProvider
-    public Object[][] findMedicineByNameProvider() {
-        List<CountMedicine> array = new ArrayList<>();
-        array.add(count_med.get(0));
-        array.add(count_med.get(1));
-        return new Object[][]{{pharmacyService.findMedicinesByName("Парацетамол"), array }};
     }
 
     @Test(dataProvider = "sellMedicineProvider")
@@ -67,17 +55,6 @@ public class TestPharmacyService {
                 {pharmacyService, count_med.get(0).getMedicine(), count_med.get(0).getCount()+2, false}};
     }
 
-    @Test(dataProvider = "CheckOverdueDayProvider")
-    public void checkOverdueDayTest(PharmacyService obj, Medicine med, boolean res) {
-        assertEquals(obj.checkOverdueDay(med), res);
-    }
-
-    @DataProvider
-    public Object[][] CheckOverdueDayProvider() {
-        return new Object[][]{{pharmacyService, arrayMedicine.get(1), true},
-                {pharmacyService, count_med.get(2).getMedicine(), false}};
-    }
-
     @Test(dataProvider = "sortedListProvider")
     public void getSortedByPricesTest(PharmacyService obj, List<Medicine> res) {
         assertEquals(obj.getSortedByPrice(), res);
@@ -86,7 +63,7 @@ public class TestPharmacyService {
     @DataProvider
     public Object[][] sortedListProvider() {
         List<Medicine> sortedArray = new ArrayList<>();
-        sortedArray.add(new Medicine("Називін", "каплі назальні", 55.00, LocalDate.now()));
+        sortedArray.add(new Medicine("Називін", "каплі назальні", 55.00, LocalDate.of(2019, 1, 1)));
         sortedArray.add(new Medicine("Парацетамол", "таблетки", 80.00, LocalDate.of(2019, 12, 1)));
         sortedArray.add(new Medicine("Парацетамол", "каплі", 81.00, LocalDate.of(2019, 12, 1)));
         return new Object[][] {{pharmacyService, sortedArray}};
@@ -107,7 +84,7 @@ public class TestPharmacyService {
     }
 
     @Test(dataProvider = "findMedicineProvider")
-    public void findMedicineByName(List<CountMedicine> actual, List<CountMedicine> expected) {
+    public void findMedicineByNameTest(List<CountMedicine> actual, List<CountMedicine> expected) {
         assertEquals(actual, expected);
     }
 
@@ -119,4 +96,9 @@ public class TestPharmacyService {
         return new Object[][] {{pharmacyService.findMedicinesByName("Парацетамол"), array},
                 {pharmacyService.findMedicinesByName("NotExist"), new ArrayList<CountMedicine>()}};
     }
+
+    public void removeOverdueMedicineTest() {
+        assertTrue(pharmacyService.removeOverdueMedicine());
+    }
+
 }

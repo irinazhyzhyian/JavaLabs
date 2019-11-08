@@ -2,14 +2,14 @@ package testng.lab2;
 
 import main.lab2.exception.ConvertException;
 import main.lab2.model.Medicine;
-import main.lab2.service.MyTypeSerializer;
+import main.lab2.service.TextSerializer;
 import org.testng.Assert;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
 import java.time.LocalDate;
 
-public class TestMyTypeSerializer {
+public class TestTextSerializer {
     private Medicine medicine;
 
     @BeforeTest
@@ -25,13 +25,13 @@ public class TestMyTypeSerializer {
     @Test
     public void serializeToStringTest() throws ConvertException {
         String expected = "Name---form---200.0---2019-12-01";
-        String medstr = new MyTypeSerializer().serializeToString(medicine);
+        String medstr = new TextSerializer().serializeToString(medicine);
         Assert.assertEquals(expected, medstr);
     }
 
     @Test
     public void deserializeFromStringTest() throws ConvertException {
         String string = "Name---form---200.0---2019-12-01";
-        Assert.assertEquals(medicine, new MyTypeSerializer().deserializeFromString(string));
+        Assert.assertEquals(medicine, new TextSerializer().deserializeFromString(string));
     }
 }
