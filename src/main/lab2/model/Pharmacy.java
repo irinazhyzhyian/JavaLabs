@@ -1,15 +1,16 @@
-package lab1;
+package main.lab2.model;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class Pharmacy {
-    public static final Integer MAXNAMELENGTH = 20;
+    public static final Integer MAX_NAME_LENGTH = 20;
     private String name;
     private List<CountMedicine> countMedicines = new ArrayList<>();
     private Person pharmacist;
 
     public Pharmacy() {
-
     }
 
     /**
@@ -29,7 +30,7 @@ public class Pharmacy {
     }
 
     public void setName(String name) {
-        if (name.length() > MAXNAMELENGTH)
+        if (name.length() > MAX_NAME_LENGTH)
             throw new RuntimeException("Wrong input!");
         this.name = name;
     }
@@ -72,5 +73,38 @@ public class Pharmacy {
                 ", countMedicines=" + countMedicines +
                 ", pharmacist=" + pharmacist +
                 '}';
+    }
+
+    /**
+     * inner class builder which implements
+     * pattern "Builder"
+     */
+    public static class Builder {
+        Pharmacy pharmacy;
+
+        public Builder() {
+            pharmacy = new Pharmacy();
+        }
+
+        public Builder setName(String name) throws IllegalArgumentException {
+            if (name.length() > MAX_NAME_LENGTH)
+                throw new IllegalArgumentException("FirstName length must be less than " + MAX_NAME_LENGTH.toString());
+            pharmacy.name = name;
+            return this;
+        }
+
+        public Builder setCountMedicines(List<CountMedicine> countMedicines) {
+            pharmacy.countMedicines = countMedicines;
+            return this;
+        }
+
+        public Builder setPharmacist(Person pharmacist) {
+            pharmacy.pharmacist = pharmacist;
+            return this;
+        }
+
+        public Pharmacy build() {
+            return pharmacy;
+        }
     }
 }

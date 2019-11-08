@@ -1,4 +1,8 @@
-package lab1;
+package main.lab1.service;
+
+import main.lab1.model.CountMedicine;
+import main.lab1.model.Medicine;
+import main.lab1.model.Pharmacy;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -97,6 +101,27 @@ public class PharmacyService {
         return "PharmacyService{" +
                 "pharmacy=" + pharmacy +
                 '}';
+    }
+
+    /**
+     * inner class builder which implements
+     * pattern "Builder"
+     */
+    public static class Builder {
+        PharmacyService pharmacyService;
+
+        public Builder() {
+            pharmacyService = new PharmacyService();
+        }
+
+        public Builder setPharmacy(Pharmacy pharm) {
+            pharmacyService.pharmacy = pharm;
+            return this;
+        }
+
+        public PharmacyService build() {
+            return pharmacyService;
+        }
     }
 
     public static void main(String[] args) { }

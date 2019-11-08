@@ -1,8 +1,8 @@
-package lab1;
+package main.lab3.model;
 
 import java.util.Objects;
 
-public class CountMedicine {
+public class CountMedicine implements Comparable<CountMedicine> {
     private Medicine medicine;
     private Integer count;
 
@@ -56,6 +56,36 @@ public class CountMedicine {
                 ", count=" + count +
                 '}';
     }
+
+    @Override
+    public int compareTo(CountMedicine o) {
+        if(this.count < o.count)
+            return 1;
+       else return -1;
+    }
+
+    public static class Builder {
+        CountMedicine countMed;
+
+        public Builder() {
+            countMed = new CountMedicine();
+        }
+
+        public Builder setMedicine(Medicine med) {
+            countMed.medicine = med;
+            return this;
+        }
+
+        public Builder setCount(Integer count) {
+            countMed.count=count;
+            return  this;
+        }
+
+        public CountMedicine build() {
+            return countMed;
+        }
+    }
+
 }
 
 

@@ -1,0 +1,42 @@
+{
+  "name" : "Pharm",
+  "countMedicines" : [ {
+    "medicine" : {
+      "name" : "Парацетамол",
+      "form" : "таблетки",
+      "price" : 80.0,
+      "overdueDay" : "2019-12-01"
+    },
+    "count" : 500
+  }, {
+    "medicine" : {
+      "name" : "Пектолван",
+      "form" : "сироп",
+      "price" : 45.5,
+      "overdueDay" : "2019-12-19"
+    },
+    "count" : 550
+  }, {
+    "medicine" : {
+      "name" : "Валер'янка",
+      "form" : "каплі",
+      "price" : 63.25,
+      "overdueDay" : "2020-01-02"
+    },
+    "count" : 600
+  }, {
+    "medicine" : {
+      "name" : "Називін",
+      "form" : "каплі назальні",
+      "price" : 55.0,
+      "overdueDay" : "2019-11-01"
+    },
+    "count" : 650
+  } ],
+  "pharmacist" : {
+    "firstName" : "Name",
+    "lastName" : "Testing",
+    "birthday" : "2019-11-01",
+    "salary" : 5000.0
+  }
+}

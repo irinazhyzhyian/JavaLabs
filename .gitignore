@@ -15,3 +15,4 @@
 log/
 out/
 target/
+/src/main/lab2/service/MyTypeSerializer.java

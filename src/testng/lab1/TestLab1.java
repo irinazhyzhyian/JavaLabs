@@ -1,14 +1,14 @@
-package testng;
+package testng.lab1;
 
 import static org.testng.Assert.assertEquals;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import lab1.Medicine;
-import lab1.Pharmacy;
-import lab1.Person;
-import lab1.CountMedicine;
-import lab1.PharmacyService;
+import main.lab1.model.Medicine;
+import main.lab1.model.Pharmacy;
+import main.lab1.model.Person;
+import main.lab1.model.CountMedicine;
+import main.lab1.service.PharmacyService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,22 +31,47 @@ public class TestLab1 {
 
 
         Person person = new Person.Builder().build();
-        pharmacy = Pharmacy.builder().name("Pharmacy #1")
-                             .pharmacist(person)
-                             .countMedicines(count_med)
+        pharmacy = new Pharmacy.Builder().setName("Pharmacy #1")
+                             .setPharmacist(person)
+                             .setCountMedicines(count_med)
                               .build();
     }
 
     @Test
     public void personBuilderTest() {
         Person person = new Person.Builder()
-                .setFirstName("Vasya")
+                .setFirstName("Name")
                 .setLastName("Testing")
                 .setBirthDay(LocalDate.now())
-                .setSalary(0.0)
+                .setSalary(2000.0)
                 .build();
+    }
 
-        System.out.println(person);
+    @Test
+    public void medicineBuilderTest() {
+       Medicine medicine = new Medicine.Builder()
+               .setName("Name")
+               .setForm("form")
+               .setPrice(200.0)
+               .setOverdueDay(LocalDate.now())
+               .build();
+    }
+
+    @Test
+    public void countMedicineBuilderTest() {
+        CountMedicine countMed = new CountMedicine.Builder()
+                                                  .setCount(100)
+                                                  .setMedicine(null)
+                                                  .build();
+    }
+
+    @Test
+    public void pharmacyBuilderTest() {
+        Pharmacy pharmacy = new Pharmacy.Builder()
+                                        .setName("name")
+                                        .setCountMedicines(null)
+                                        .setPharmacist(null)
+                                        .build();
     }
 
     @Test(expectedExceptions = IllegalArgumentException.class)
@@ -104,7 +129,7 @@ public class TestLab1 {
 
     @DataProvider
     public Object[][] listMedicineProvider() {
-        return new Object[][]{{PharmacyService.builder().pharmacy(pharmacy).build(), arrayMedicine}};
+        return new Object[][]{{new PharmacyService.Builder().setPharmacy(pharmacy).build(), arrayMedicine}};
     }
 
     @Test(dataProvider = "ifMedicineExistProvider")
@@ -115,7 +140,7 @@ public class TestLab1 {
     @DataProvider
     public Object[][] ifMedicineExistProvider() {
         Medicine falseMedicine = new Medicine("Лазолван", "таблетки", 45.50, LocalDate.of(2019, 12, 1));
-        PharmacyService pharmacyService = PharmacyService.builder().pharmacy(pharmacy).build();
+        PharmacyService pharmacyService = new PharmacyService.Builder().setPharmacy(pharmacy).build();
         return new Object[][]{{pharmacyService, arrayMedicine.get(2), true}, {pharmacyService, falseMedicine, false}};
     }
 
@@ -126,7 +151,7 @@ public class TestLab1 {
 
     @DataProvider
     public Object[][] sellMedicineProvider() {
-        PharmacyService pharmacyService = PharmacyService.builder().pharmacy(pharmacy).build();
+        PharmacyService pharmacyService = new PharmacyService.Builder().setPharmacy(pharmacy).build();
         return new Object[][]{{pharmacyService, count_med.get(0).getMedicine(), count_med.get(0).getCount(), true},
                 {pharmacyService, count_med.get(0).getMedicine(), count_med.get(0).getCount()+2, false}};
     }
@@ -138,7 +163,7 @@ public class TestLab1 {
 
     @DataProvider
     public Object[][] CheckOverdueDayProvider() {
-        PharmacyService pharmacyService = PharmacyService.builder().pharmacy(pharmacy).build();
+        PharmacyService pharmacyService = new PharmacyService.Builder().setPharmacy(pharmacy).build();
         return new Object[][]{{pharmacyService, arrayMedicine.get(1), true},
                 {pharmacyService, count_med.get(3).getMedicine(), false}};
     }
@@ -156,6 +181,6 @@ public class TestLab1 {
         sortedArray.add(new Medicine("Валер'янка", "каплі", 63.25, LocalDate.of(2020, 1, 2)));
         sortedArray.add(new Medicine("Парацетамол", "таблетки", 80.00, LocalDate.of(2019, 12, 1)));
         sortedArray.add(new Medicine("Зіпелор", "спрей", 150.00, LocalDate.of(2019, 6, 8)));
-        return new Object[][] {{PharmacyService.builder().pharmacy(pharmacy).build(), sortedArray}};
+        return new Object[][] {{new PharmacyService.Builder().setPharmacy(pharmacy).build(), sortedArray}};
     }
 }

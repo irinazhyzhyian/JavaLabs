@@ -1,23 +1,31 @@
-package lab1;
+package main.lab3.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import main.lab2.service.LocalDateDeserializer;
+import main.lab2.service.LocalDateSerializer;
+
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public class Person {
-    public static final Integer MAXFIRSTNAMELENGTH = 20;
-    public static final Double MINSALARY = 1000.00;
+public class Person implements Serializable {
+    public static final Integer MAX_FIRST_NAME_LENGTH = 20;
+    public static final Double MIN_SALARY = 1000.00;
     private String firstName;
     private String lastName;
+    @JsonFormat(pattern = "yyyyMMdd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
     private LocalDate birthday;
     private Double salary;
 
-    // private to disallow creating Person from another classes
-    // can be created using Builder
     private Person() {
     }
 
     public void setFirst_name(String firstName) {
-        if (firstName.length() > MAXFIRSTNAMELENGTH)
+        if (firstName.length() > MAX_FIRST_NAME_LENGTH)
             throw new RuntimeException("Wrong input!");
         this.firstName = firstName;
     }
@@ -39,13 +47,13 @@ public class Person {
     }
 
     public void setLastName(String lastName) {
-        if (lastName.length() > MAXFIRSTNAMELENGTH)
+        if (lastName.length() > MAX_FIRST_NAME_LENGTH)
             throw new RuntimeException("Wrong input!");
         this.lastName = lastName;
     }
 
     public void setSalary(Double salary) {
-        if (salary < MINSALARY)
+        if (salary < MIN_SALARY)
             throw new RuntimeException("Wrong input!");
         this.salary = salary;
     }
@@ -79,6 +87,10 @@ public class Person {
                 '}';
     }
 
+    /**
+     * inner class builder which implements
+     * pattern "Builder"
+     */
     public static class Builder {
         Person person;
 
@@ -93,8 +105,8 @@ public class Person {
          * @throws IllegalArgumentException if length of firstName > MAXFIRSTNAMELENGTH
          */
         public Builder setFirstName(String firstName) throws IllegalArgumentException {
-            if (firstName.length() > MAXFIRSTNAMELENGTH)
-                throw new IllegalArgumentException("FirstName length must be less than " + MAXFIRSTNAMELENGTH.toString());
+            if (firstName.length() > MAX_FIRST_NAME_LENGTH)
+                throw new IllegalArgumentException("FirstName length must be less than " + MAX_FIRST_NAME_LENGTH.toString());
             person.firstName = firstName;
             return this;
         }
@@ -115,8 +127,8 @@ public class Person {
          * @return instance of this builder
          */
         public Builder setSalary(Double salary) {
-            if (salary < MINSALARY)
-                person.salary = MINSALARY;
+            if (salary < MIN_SALARY)
+                throw new IllegalArgumentException("Wrong input!");
             else
                 person.salary = salary;
             return this;

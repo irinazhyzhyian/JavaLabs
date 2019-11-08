@@ -1,16 +1,17 @@
-package lab1;
+package main.lab1.model;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-
 public class Medicine implements Comparable<Medicine> {
-    public static final Integer MAX_NAME_LENGTH = 20;
+    public static final Integer MAXNAMELENGTH = 20;
     private String name;
     private String form;
     private Double price;
     private LocalDate overdueDay;
 
+    // private to disallow creating Person from another classes
+    // can be created using Builder
     public Medicine() { }
 
     public Medicine(String name, String form, Double price, LocalDate overdueDay) {
@@ -25,7 +26,7 @@ public class Medicine implements Comparable<Medicine> {
     }
 
     public void setName(String name) {
-        if (name.length() > MAX_NAME_LENGTH)
+        if (name.length() > MAXNAMELENGTH)
             throw new RuntimeException("Wrong input!");
         this.name = name;
     }
@@ -35,7 +36,7 @@ public class Medicine implements Comparable<Medicine> {
     }
 
     public void setForm(String form) {
-        if (form.length() > 10)
+        if (form.length() > 30)
             throw new RuntimeException("Wrong input!");
         this.form = form;
     }
@@ -48,6 +49,12 @@ public class Medicine implements Comparable<Medicine> {
         if (price <= 0)
             throw new RuntimeException("Wrong input!");
         this.price = price;
+    }
+
+    public void setOverdueDay( LocalDate date) {
+        if(date.isBefore(LocalDate.now()))
+            throw new IllegalArgumentException("Wrong input!");
+        this.overdueDay = date;
     }
 
     public LocalDate getOverdueDay() {
@@ -85,4 +92,45 @@ public class Medicine implements Comparable<Medicine> {
                 ", overdueDay=" + overdueDay +
                 '}';
     }
+
+    /**
+     * inner class builder which implements
+     * pattern "Builder"
+     */
+    public static class Builder {
+        Medicine medicine;
+
+        public Builder() {
+            medicine = new Medicine();
+        }
+
+        public Builder setName(String name) throws IllegalArgumentException {
+            if (name.length() > MAXNAMELENGTH)
+                throw new IllegalArgumentException("FirstName length must be less than " + MAXNAMELENGTH.toString());
+            medicine.name = name;
+            return this;
+        }
+
+        public Builder setForm(String form) {
+            if (form.length() > 10)
+                throw new RuntimeException("Wrong input!");
+            medicine.form = form;
+            return this;
+        }
+
+        public Builder setPrice(Double price) {
+            medicine.price = price;
+            return this;
+        }
+
+        public Builder setOverdueDay( LocalDate date) {
+            if(date.isBefore(LocalDate.now()))
+                throw new IllegalArgumentException("Wrong input!");
+            medicine.overdueDay = date;
+            return this;
+        }
+
+        public Medicine build() { return medicine;}
+    }
+
 }

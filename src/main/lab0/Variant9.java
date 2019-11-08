@@ -1,4 +1,4 @@
-package lab0;
+package main.lab0;
 
 import java.util.Objects;
 

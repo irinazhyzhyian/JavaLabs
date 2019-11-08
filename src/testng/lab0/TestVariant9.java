@@ -1,12 +1,10 @@
-package testng;
-import static org.testng.Assert.assertEquals;
+package testng.lab0;
 
+import static org.testng.Assert.assertEquals;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import lab0.Variant9.Change;
-
-import lab0.Variant9;
+import main.lab0.Variant9;
 public class TestVariant9 {
     public static double EPS = 0.0000001;
 
@@ -197,7 +195,5 @@ public class TestVariant9 {
         return new Object[][] { {input1, output1}, { input2, output2 } };
 
     }
-
-
 
 }
