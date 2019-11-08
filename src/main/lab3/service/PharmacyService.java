@@ -121,5 +121,5 @@ public class PharmacyService {
                 "pharmacy=" + pharmacy +
                 '}';
     }
-    public static void main(String[] args) { }
+
 }
