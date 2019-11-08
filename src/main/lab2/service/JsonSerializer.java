@@ -2,11 +2,20 @@ package main.lab2.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import main.lab2.IO;
+import main.lab2.exception.ConvertException;
+import main.lab2.model.CountMedicine;
+import main.lab2.model.Medicine;
+import main.lab2.model.Person;
+import main.lab2.model.Pharmacy;
 
 public class JsonSerializer<T> implements IO<T> {
     private Class<T> classObject;

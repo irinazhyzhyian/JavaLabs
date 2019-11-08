@@ -1,18 +1,12 @@
 package main.lab2.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import main.lab2.model.CountMedicine;
-import main.lab2.model.Medicine;
-import main.lab2.model.Person;
-import main.lab2.model.Pharmacy;
 import main.lab2.IO;
 import main.lab2.exception.ConvertException;
-
 import java.io.*;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class XmlSerializer<T> implements IO<T> {
 
@@ -37,7 +31,7 @@ public class XmlSerializer<T> implements IO<T> {
     public void toFile(T obj, File file) throws ConvertException {
         try {
              XmlMapper mapper = new XmlMapper();
-            //String str = "kkk" + mapper.writerWithDefaultPrettyPrinter().writeValueAsString(obj);
+           // mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.writeValue(file, obj);
         } catch (IOException e) {
             throw new ConvertException(e.getMessage());
@@ -53,6 +47,7 @@ public class XmlSerializer<T> implements IO<T> {
     @Override
    public T fromFile(File file) throws ConvertException {
         try {
+
              XmlMapper mapper = new XmlMapper();
              return mapper.readValue(file, classObject);
 
@@ -78,5 +73,6 @@ public class XmlSerializer<T> implements IO<T> {
         XmlMapper mapper= new XmlMapper();
         return mapper.readValue(string, classObject);
     }
+
 }
 
