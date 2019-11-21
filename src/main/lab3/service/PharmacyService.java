@@ -71,7 +71,8 @@ public class PharmacyService {
      */
     private List<CountMedicine> getListOfOverdueMedicine() {
         return pharmacy.getCountMedicines()
-                       .stream().filter(a-> new MedicineService(a.getMedicine()).checkOverdueDay())
+                       .stream()
+                       .filter(a-> new MedicineService(a.getMedicine()).checkOverdueDay())
                        .collect(Collectors.toList());
     }
 
