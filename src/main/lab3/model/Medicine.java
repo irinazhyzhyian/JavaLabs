@@ -61,8 +61,8 @@ public class Medicine implements Comparable<Medicine> {
     }
 
     public void setOverdueDay( LocalDate date) {
-        //if(date.isBefore(LocalDate.now()))
-           // throw new IllegalArgumentException("Wrong input!");
+        if(date.isBefore(LocalDate.now()))
+            throw new IllegalArgumentException("Wrong input!");
         this.overdueDay = date;
     }
 
@@ -89,6 +89,8 @@ public class Medicine implements Comparable<Medicine> {
     public int compareTo(Medicine o) {
         if (this.getPrice() < o.getPrice())
             return -1;
+        if (this.getPrice().equals(o.getPrice()))
+            return 0;
         else return 1;
     }
 

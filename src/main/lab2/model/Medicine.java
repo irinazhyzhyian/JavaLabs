@@ -131,6 +131,9 @@ public class Medicine implements Comparable<Medicine> {
             return this;
         }
 
+        @JsonFormat(pattern = "yyyyMMdd")
+        @JsonDeserialize(using = LocalDateDeserializer.class)
+        @JsonSerialize(using = LocalDateSerializer.class)
         public Builder setOverdueDay( LocalDate date) {
             if(date.isBefore(LocalDate.now()))
                 throw new IllegalArgumentException("Wrong input!");

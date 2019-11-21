@@ -1,32 +1,50 @@
-package main.lab2.model;
+package main.lab4.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import main.lab2.service.LocalDateDeserializer;
 import main.lab2.service.LocalDateSerializer;
+import main.lab4.service.Age;
+import main.lab4.service.MinSalary;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class Person implements Serializable {
-    public static final Integer MAX_FIRST_NAME_LENGTH = 20;
-    public static final Double MIN_SALARY = 1000.00;
+
+    @NotNull(message = " field can`t be null")
+    @PositiveOrZero
+    private Integer id;
+
+    @Size(min = 1, max=20)
     private String firstName;
+
+    @Size(min = 1, max=20)
     private String lastName;
+
     @JsonFormat(pattern = "yyyyMMdd")
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
+    @Age(value = 18, message = "is wrong! Person should be older then 18 y.o.")
     private LocalDate birthday;
+
+    @MinSalary(value = 1000.0)
     private Double salary;
 
     private Person() {
     }
 
     public void setFirst_name(String firstName) {
-        if (firstName.length() > MAX_FIRST_NAME_LENGTH)
-            throw new RuntimeException("Wrong input!");
         this.firstName = firstName;
     }
 
@@ -47,19 +65,23 @@ public class Person implements Serializable {
     }
 
     public void setLastName(String lastName) {
-        if (lastName.length() > MAX_FIRST_NAME_LENGTH)
-            throw new RuntimeException("Wrong input!");
         this.lastName = lastName;
     }
 
     public void setSalary(Double salary) {
-        if (salary < MIN_SALARY)
-            throw new RuntimeException("Wrong input!");
         this.salary = salary;
     }
 
     public void setBirthday(LocalDate birthday) {
         this.birthday = birthday;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     @Override
@@ -98,15 +120,17 @@ public class Person implements Serializable {
             this.person = new Person();
         }
 
+        public Builder setId(Integer id) {
+            person.id=id;
+            return this;
+        }
+
         /**
          * Sets firstName for person
          * @param firstName String
          * @return instance of this builder
-         * @throws IllegalArgumentException if length of firstName > MAXFIRSTNAMELENGTH
          */
-        public Builder setFirstName(String firstName) throws IllegalArgumentException {
-            if (firstName.length() > MAX_FIRST_NAME_LENGTH)
-                throw new IllegalArgumentException("FirstName length must be less than " + MAX_FIRST_NAME_LENGTH.toString());
+        public Builder setFirstName(String firstName) {
             person.firstName = firstName;
             return this;
         }
@@ -116,9 +140,6 @@ public class Person implements Serializable {
             return this;
         }
 
-        @JsonFormat(pattern = "yyyyMMdd")
-        @JsonDeserialize(using = LocalDateDeserializer.class)
-        @JsonSerialize(using = LocalDateSerializer.class)
         public Builder setBirthDay(LocalDate birthDay) {
             person.birthday = birthDay;
             return this;
@@ -130,9 +151,6 @@ public class Person implements Serializable {
          * @return instance of this builder
          */
         public Builder setSalary(Double salary) {
-            if (salary < MIN_SALARY)
-                throw new IllegalArgumentException("Wrong input!");
-            else
                 person.salary = salary;
             return this;
         }
@@ -141,8 +159,28 @@ public class Person implements Serializable {
          * Call it after setting all parameters
          * @return instance of class Person
          */
-        public Person build() {
-            return person;
+        public Person build() throws IllegalStateException {
+
+            try {
+                Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+                Set<ConstraintViolation<Person>> constraintViolations = validator.validate(person);
+
+                if (constraintViolations.isEmpty())
+                    return person;
+                else {
+                    Set<String> exceptions = new HashSet<>();
+                    for (ConstraintViolation constraintViolation : constraintViolations) {
+                        String fieldName = constraintViolation.getPropertyPath().toString().toUpperCase();
+                        exceptions.add(fieldName + " " + constraintViolation.getMessage());
+                    }
+                   exceptions.forEach(System.out::println);
+                    throw new IllegalStateException(exceptions.toString()+" ");
+                }
+            } catch (IllegalStateException e) {
+                throw new IllegalStateException(e.getMessage());
+
+            }
+
         }
     }
 }
