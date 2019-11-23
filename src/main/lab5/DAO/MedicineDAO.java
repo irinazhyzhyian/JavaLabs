@@ -5,17 +5,19 @@ import main.lab5.model.Medicine;
 import javax.validation.constraints.NotNull;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
 
-public class MedicineDAO implements DAO<Medicine, String> {
+public class MedicineDAO implements DAO<Medicine, Integer> {
 
     /**
      * SQL queries for medicines table.
      */
     enum PersonSQL {
-        GET("SELECT * FROM medicines  WHERE medicines.name = (?)"),
-        INSERT("INSERT INTO medicines (id, name, form, overdue_day, price) VALUES ((?), (?), (?), (?), (?))"),
+        GET("SELECT * FROM medicines  WHERE medicines.id = (?)"),
+        INSERT("INSERT INTO medicines (id, name, form, overdue_day, price) VALUES ((?), (?), (?), (?), (?)) RETURNING id"),
         DELETE("DELETE FROM medicines WHERE id = (?) RETURNING id"),
-        UPDATE("UPDATE medicines SET price = (?) WHERE name = (?) AND form = (?) RETURNING id");
+        UPDATE("UPDATE medicines SET price = (?) WHERE form = (?) RETURNING id");
 
         String QUERY;
 
@@ -64,16 +66,16 @@ public class MedicineDAO implements DAO<Medicine, String> {
     /**
      * Select User by login.
      *
-     * @param  name for select.
+     * @param  id for select.
      * @return return valid entity if she exist. If entity does not exist return empty User with id = -1.
      */
     @Override
-    public Medicine read(String name) {
+    public Medicine read(Integer id) {
         final Medicine result = new Medicine();
         result.setId(-1);
 
         try (PreparedStatement statement = connection.prepareStatement(PersonSQL.GET.QUERY)) {
-            statement.setString(1, name);
+            statement.setInt(1, id);
             final ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 result.setId(Integer.parseInt(resultSet.getString("id")));
@@ -100,7 +102,7 @@ public class MedicineDAO implements DAO<Medicine, String> {
 
         try(PreparedStatement statement = connection.prepareStatement(PersonSQL.UPDATE.QUERY)) {
             statement.setDouble(1, medicine.getPrice());
-            statement.setInt(2, medicine.getId());
+            statement.setString(2, medicine.getForm());
             result = statement.executeQuery().next();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -126,4 +128,23 @@ public class MedicineDAO implements DAO<Medicine, String> {
         }
         return result;
     }
+
+    @Override
+    public Medicine resultSetToObj(ResultSet rs) throws SQLException {
+        Medicine medicine = new Medicine();
+
+//        Integer id = rs.getInt("id");
+//        if (cache.contains(id)) medicine = cache.get(id);
+//        else medicine = new Medicine();
+
+        if(rs.next()) {
+            medicine.setId(rs.getInt("id"));
+            medicine.setName(rs.getString("name"));
+            medicine.setOverdueDay(LocalDate.parse(rs.getDate("overdue_day").toString()));
+            medicine.setPrice(rs.getDouble("price"));
+            medicine.setForm(rs.getString("form"));
+        }
+        return medicine;
+    }
+
 }

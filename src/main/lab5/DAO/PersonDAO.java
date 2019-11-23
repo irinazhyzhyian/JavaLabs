@@ -5,15 +5,16 @@ import main.lab5.model.Person;
 import javax.validation.constraints.NotNull;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.List;
 
-public class  PersonDAO implements DAO<Person, String> {
+public class  PersonDAO implements DAO<Person, Integer> {
 
     /**
      * SQL queries for persons table.
      */
     enum PersonSQL {
-        GET("SELECT * FROM persons  WHERE persons.last_name = (?)"),
-        INSERT("INSERT INTO persons (id, first_name, last_name, birthday, salary) VALUES ((?), (?), (?), (?), (?))"),
+        GET("SELECT * FROM persons  WHERE persons.id = (?)"),
+        INSERT("INSERT INTO persons (id, first_name, last_name, birthday, salary) VALUES ((?), (?), (?), (?), (?)) RETURNING id"),
         DELETE("DELETE FROM persons WHERE id = (?) RETURNING id"),
         UPDATE("UPDATE persons SET salary = (?) WHERE id = (?) RETURNING id");
 
@@ -64,16 +65,16 @@ public class  PersonDAO implements DAO<Person, String> {
     /**
      * Select Person by last_name.
      *
-     * @param last_name for select.
+     * @param id for select.
      * @return return valid entity if she exist. If entity does not exist return empty Person with id = -1.
      */
     @Override
-    public Person read(String last_name) {
+    public Person read(Integer id) {
         Person result = new Person();
         result.setId(-1);
 
         try (PreparedStatement statement = connection.prepareStatement(PersonSQL.GET.QUERY)) {
-            statement.setString(1, last_name);
+            statement.setInt(1, id);
             final ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
                 result.setId(Integer.parseInt(resultSet.getString("id")));
@@ -127,4 +128,24 @@ public class  PersonDAO implements DAO<Person, String> {
         }
         return result;
     }
+
+    @Override
+    public Person resultSetToObj(ResultSet rs) throws SQLException {
+        Person person = new Person();
+
+//        Integer id = rs.getInt("id");
+//        if (cache.contains(id)) person = cache.get(id);
+//        else person = new Medicine();
+
+        if(rs.next()) {
+            person.setId(rs.getInt("id"));
+            person.setFirstName(rs.getString("first_name"));
+            person.setLastName(rs.getString("last_name"));
+            person.setBirthday(rs.getDate("birthday").toLocalDate());
+            person.setSalary(rs.getDouble("salary"));
+        }
+
+        return person;
+    }
+
 }

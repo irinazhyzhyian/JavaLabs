@@ -1,6 +1,6 @@
 package main.lab5.database;
 
-import main.lab5.database.exceptions.DataBaseConnectExeption;
+import main.lab5.database.exceptions.DataBaseConnectException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,13 +24,12 @@ public class ConnectionManager {
                     properties.getProperty("login"),
                     properties.getProperty("password")
             );
-            System.out.println("connected!");
             return connection;
         }catch (FileNotFoundException ex ) {
             throw new SQLException( ex );
 
         }catch (Exception e) {
-            throw new DataBaseConnectExeption(e.getMessage());
+            throw new DataBaseConnectException(e.getMessage());
         }
     }
 

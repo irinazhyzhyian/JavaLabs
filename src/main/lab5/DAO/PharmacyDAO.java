@@ -1,13 +1,18 @@
 package main.lab5.DAO;
 
 import main.lab5.model.CountMedicine;
+import main.lab5.model.Medicine;
 import main.lab5.model.Person;
 import main.lab5.model.Pharmacy;
+import org.w3c.dom.ls.LSOutput;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PharmacyDAO implements DAO<Pharmacy, Integer> {
 
@@ -16,9 +21,12 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
      */
     enum PharmacySQL {
         GET("SELECT * FROM pharmacy  WHERE pharmacy.id = (?)"),
-        INSERT("INSERT INTO pharmacy (id, name, count_medicine_id, pharmacist_id) VALUES ((?), (?), (?), (?))"),
+        INSERT("INSERT INTO pharmacy (id, name, pharmacist_id) VALUES ((?), (?), (?)) RETURNING id"),
         DELETE("DELETE FROM pharmacy WHERE id = (?) RETURNING id"),
-        UPDATE("UPDATE pharmacy SET name = (?) WHERE id = (?) RETURNING id");
+        UPDATE("UPDATE pharmacy SET name = (?) WHERE id = (?) RETURNING id"),
+
+        GET_COUNT_MED_LIST("SELECT * FROM count_medicines WHERE pharmacy_id=(?)"),
+        GET_PERSON("SELECT * FROM persons  WHERE persons.id = (?)");
 
         String QUERY;
 
@@ -53,8 +61,7 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         PreparedStatement statement = connection.prepareStatement(PharmacySQL.INSERT.QUERY);
         statement.setInt(1, pharmacy.getId());
         statement.setString(2, pharmacy.getName());
-        statement.setObject(3, pharmacy.getCountMedicines());
-        statement.setObject(4, pharmacy.getPharmacist());
+        statement.setInt(3, pharmacy.getPharmacist().getId());
         return statement.executeQuery().next();
     }
 
@@ -74,8 +81,8 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         ResultSet resultSet = statement.executeQuery();
         if(resultSet.next()) {
             result.setId(resultSet.getInt("id"));
-           // result.setCountMedicines(resultSet.getObject("medicine", CountMedicine.class));
-            result.setPharmacist(resultSet.getObject("pharmacist", Person.class));
+            result.setPharmacist(new PersonDAO(connection).read(resultSet.getInt("pharmacist_id")));
+            result.setCountMedicines(getListCountMedicine(result));
             result.setName(resultSet.getString("name"));
         }
         return result;
@@ -111,4 +118,37 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
 
         return statement.executeQuery().next();
     }
+
+    public List<CountMedicine> getListCountMedicine(Pharmacy pharmacy) throws SQLException {
+        List<CountMedicine> list = new ArrayList<>();
+
+        try( PreparedStatement statement = connection.prepareStatement(PharmacySQL.GET_COUNT_MED_LIST.QUERY)) {
+            statement.setInt(1, pharmacy.getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            do {
+                CountMedicine countMedicine = new CountMedicineDAO(connection).resultSetToObj(resultSet);
+                list.add(countMedicine);
+            } while (!resultSet.isLast());
+        }catch (Exception e) {
+            e.getStackTrace();
+        }
+        list.forEach(System.out::println);
+        return list;
+    }
+
+    @Override
+    public Pharmacy resultSetToObj(ResultSet rs) throws SQLException {
+        Pharmacy pharmacy = new Pharmacy();
+
+        if(rs.next()) {
+            pharmacy.setId(rs.getInt("id"));
+            pharmacy.setName(rs.getString("name"));
+            pharmacy.setCountMedicines(getListCountMedicine(pharmacy));
+            pharmacy.setPharmacist(new PersonDAO(connection).read(rs.getInt("pharmacist_id")));
+        }
+
+        return pharmacy;
+    }
+
 }

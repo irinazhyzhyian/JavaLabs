@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import main.lab2.service.LocalDateDeserializer;
 import main.lab2.service.LocalDateSerializer;
-import main.lab4.service.FutureDay;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;

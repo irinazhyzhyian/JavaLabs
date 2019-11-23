@@ -3,10 +3,7 @@ package main.lab5.model;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -20,13 +17,23 @@ public class CountMedicine implements Comparable<CountMedicine> {
 
     private Integer count;
 
+    private Pharmacy pharmacy;
+
     public CountMedicine() {
     }
 
-    public CountMedicine(Medicine medicine, Integer count) {
+    public CountMedicine(Medicine medicine, Integer count, Pharmacy pharmacy) {
         this.medicine = medicine;
         this.count = count;
+        this.pharmacy = pharmacy;
+    }
 
+    public Pharmacy getPharmacy() {
+        return pharmacy;
+    }
+
+    public void setPharmacy(Pharmacy pharmacy) {
+        this.pharmacy = pharmacy;
     }
 
     public Medicine getMedicine() {
@@ -96,6 +103,11 @@ public class CountMedicine implements Comparable<CountMedicine> {
 
         public Builder setMedicine(Medicine med) {
             countMed.medicine = med;
+            return this;
+        }
+
+        public Builder setPharmacy(Pharmacy pharmacy) {
+            countMed.pharmacy = pharmacy;
             return this;
         }
 
