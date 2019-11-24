@@ -53,12 +53,13 @@ public class CountMedicineDAO implements DAO<CountMedicine, Integer> {
      */
     @Override
     public boolean create(CountMedicine countMedicine) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.INSERT.QUERY);
-        statement.setInt(1, countMedicine.getId());
-        statement.setInt(2, countMedicine.getMedicine().getId());
-        statement.setInt(3, countMedicine.getCount());
-        statement.setInt(4, countMedicine.getPharmacy().getId());
-        return statement.executeQuery().next();
+        try(PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.INSERT.QUERY)) {
+            statement.setInt(1, countMedicine.getId());
+            statement.setInt(2, countMedicine.getMedicine().getId());
+            statement.setInt(3, countMedicine.getCount());
+            statement.setInt(4, countMedicine.getPharmacy().getId());
+            return statement.executeQuery().next();
+        }
     }
 
     /**
@@ -72,16 +73,17 @@ public class CountMedicineDAO implements DAO<CountMedicine, Integer> {
     public CountMedicine read(Integer count) throws SQLException {
         CountMedicine result = new CountMedicine();
         result.setId(-1);
-        PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.GET.QUERY);
-        statement.setInt(1,count);
-        ResultSet resultSet = statement.executeQuery();
-        if(resultSet.next()) {
-            result.setId(resultSet.getInt("id"));
-            result.setMedicine(new MedicineDAO(connection).read(resultSet.getInt("medicine_id")));
-            result.setCount(resultSet.getInt("count"));
-            result.setPharmacy(new PharmacyDAO(connection).read(resultSet.getInt("pharmacy_id")));
+        try(PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.GET.QUERY)) {
+            statement.setInt(1, count);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                result.setId(resultSet.getInt("id"));
+                result.setMedicine(new MedicineDAO(connection).read(resultSet.getInt("medicine_id")));
+                result.setCount(resultSet.getInt("count"));
+                result.setPharmacy(new PharmacyDAO(connection).read(resultSet.getInt("pharmacy_id")));
+            }
+            return result;
         }
-        return result;
     }
 
     /**
@@ -93,11 +95,12 @@ public class CountMedicineDAO implements DAO<CountMedicine, Integer> {
      */
     @Override
     public boolean update(CountMedicine countMedicine) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.UPDATE.QUERY);
-        statement.setInt(1, countMedicine.getCount());
-        statement.setInt(2, countMedicine.getId());
+        try(PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.UPDATE.QUERY)) {
+            statement.setInt(1, countMedicine.getCount());
+            statement.setInt(2, countMedicine.getId());
 
-        return statement.executeQuery().next();
+            return statement.executeQuery().next();
+        }
     }
 
     /**
@@ -109,12 +112,20 @@ public class CountMedicineDAO implements DAO<CountMedicine, Integer> {
      */
     @Override
     public boolean delete(CountMedicine countMedicine) throws SQLException {
-        PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.DELETE.QUERY);
-        statement.setInt(1, countMedicine.getId());
+        try(PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.DELETE.QUERY)) {
+            statement.setInt(1, countMedicine.getId());
 
-        return statement.executeQuery().next();
+            return statement.executeQuery().next();
+        }
     }
 
+    /**
+     * Convert ResultSent into CountMedicine
+     *
+     * @param rs ResultSet to convert
+     * @return CountMedicine object
+     * @throws SQLException
+     */
     @Override
     public CountMedicine resultSetToObj(ResultSet rs) throws SQLException {
         CountMedicine count_medicine = new CountMedicine();

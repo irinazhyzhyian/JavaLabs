@@ -129,13 +129,16 @@ public class  PersonDAO implements DAO<Person, Integer> {
         return result;
     }
 
+    /**
+     * Convert ResultSet into Person
+     *
+     * @param rs ResultSet to convert
+     * @return Person object
+     * @throws SQLException
+     */
     @Override
     public Person resultSetToObj(ResultSet rs) throws SQLException {
         Person person = new Person();
-
-//        Integer id = rs.getInt("id");
-//        if (cache.contains(id)) person = cache.get(id);
-//        else person = new Medicine();
 
         if(rs.next()) {
             person.setId(rs.getInt("id"));

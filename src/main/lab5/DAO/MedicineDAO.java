@@ -129,13 +129,16 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
         return result;
     }
 
+    /**
+     * Convert ResultSet into Medicine
+     *
+     * @param rs ResultSet to convert
+     * @return Medicine object
+     * @throws SQLException
+     */
     @Override
     public Medicine resultSetToObj(ResultSet rs) throws SQLException {
         Medicine medicine = new Medicine();
-
-//        Integer id = rs.getInt("id");
-//        if (cache.contains(id)) medicine = cache.get(id);
-//        else medicine = new Medicine();
 
         if(rs.next()) {
             medicine.setId(rs.getInt("id"));

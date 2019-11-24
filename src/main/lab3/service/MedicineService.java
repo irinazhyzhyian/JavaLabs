@@ -9,6 +9,7 @@ public class MedicineService {
     public MedicineService(Medicine med) {
         this.medicine=med;
     }
+
     /**
      * @return true if medicine is overdue
      */

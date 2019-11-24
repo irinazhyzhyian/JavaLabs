@@ -5,6 +5,7 @@ import main.lab5.database.ConnectionManager;
 import main.lab5.model.CountMedicine;
 import main.lab5.model.Medicine;
 import main.lab5.model.Pharmacy;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -55,6 +56,11 @@ public class TestCountMedicineDAO {
                 .setMedicine(medicine)
                 .setPharmacy(pharmacy)
                 .build();
+    }
+
+    @AfterTest
+    public void after() throws SQLException {
+        connection.close();
     }
 
     @Test

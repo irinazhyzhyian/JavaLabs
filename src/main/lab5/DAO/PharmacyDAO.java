@@ -26,7 +26,10 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         UPDATE("UPDATE pharmacy SET name = (?) WHERE id = (?) RETURNING id"),
 
         GET_COUNT_MED_LIST("SELECT * FROM count_medicines WHERE pharmacy_id=(?)"),
-        GET_PERSON("SELECT * FROM persons  WHERE persons.id = (?)");
+        GET_OVERDUE_MEDICINES("SELECT medicines.* " +
+                "FROM count_medicines JOIN medicines ON count_medicines.medicine_id=medicines.id "+
+                "JOIN pharmacy ON count_medicines.pharmacy_id=pharmacy.id "+
+                "WHERE pharmacy.id=(?) AND medicines.overdue_day<current_date");
 
         String QUERY;
 
@@ -119,6 +122,13 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         return statement.executeQuery().next();
     }
 
+    /**
+     * Get list of Medicine and their count into Pharmacy
+     *
+     * @param pharmacy Pharmacy
+     * @return list of CountMedicine
+     * @throws SQLException
+     */
     public List<CountMedicine> getListCountMedicine(Pharmacy pharmacy) throws SQLException {
         List<CountMedicine> list = new ArrayList<>();
 
@@ -137,6 +147,51 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         return list;
     }
 
+    /**
+     * Get List of overdue medicines in pharmacy
+     *
+     * @param pharmacy Pharmacy
+     * @return list of overdue Medicines
+     * @throws SQLException
+     */
+    private List<Medicine> getListOfOverdueMedicines(Pharmacy pharmacy) throws SQLException {
+        List<Medicine> list = new ArrayList<>();
+
+        try(PreparedStatement statement = connection.prepareStatement(PharmacySQL.GET_OVERDUE_MEDICINES.QUERY)) {
+            statement.setInt(1, pharmacy.getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            do {
+                Medicine medicine = new MedicineDAO(connection).resultSetToObj(resultSet);
+                list.add(medicine);
+            } while (!resultSet.isLast());
+
+            return list;
+        }
+    }
+
+    /**
+     * Delete all overdue Medicines in Pharmacy
+     *
+     * @param pharmacy Pharmacy
+     * @throws SQLException
+     */
+    public void deleteOverdueMedicines(Pharmacy pharmacy) throws SQLException {
+        List<Medicine> medicineList = new ArrayList<>();
+        medicineList = getListOfOverdueMedicines(pharmacy);
+
+        for (Medicine medicine: medicineList) {
+            new MedicineDAO(connection).delete(medicine);
+        }
+    }
+
+    /**
+     * Convert ResultSer into Pharmacy Object
+     *
+     * @param rs ResultSet to convert
+     * @return Pharmacy object
+     * @throws SQLException
+     */
     @Override
     public Pharmacy resultSetToObj(ResultSet rs) throws SQLException {
         Pharmacy pharmacy = new Pharmacy();

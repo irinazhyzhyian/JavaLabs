@@ -3,6 +3,7 @@ package testng.lab5;
 import main.lab5.model.Medicine;
 import main.lab5.DAO.MedicineDAO;
 import main.lab5.database.ConnectionManager;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 
@@ -38,6 +39,11 @@ public class TestMedicineDAO {
                 .setOverdueDay(LocalDate.of(2019, 12, 12))
                 .setPrice(200.0)
                 .build();
+    }
+
+    @AfterTest
+    public void after() throws SQLException {
+        connection.close();
     }
 
     @Test

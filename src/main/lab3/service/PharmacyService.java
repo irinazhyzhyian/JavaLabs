@@ -67,7 +67,7 @@ public class PharmacyService {
     }
 
     /**
-     * @return true if medicine isn`t overdue
+     * @return list of overdue Medicines
      */
     private List<CountMedicine> getListOfOverdueMedicine() {
         return pharmacy.getCountMedicines()
@@ -76,6 +76,10 @@ public class PharmacyService {
                        .collect(Collectors.toList());
     }
 
+    /**
+     * remove all overdue medicines in pharmacy
+     * @return true if updated
+     */
     public boolean removeOverdueMedicine() {
        return pharmacy.getCountMedicines().removeAll(getListOfOverdueMedicine());
     }

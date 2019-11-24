@@ -46,14 +46,14 @@ public class TestPharmacyDAO {
                 .setId(4)
                 .setForm("form")
                 .setName("Name")
-                .setOverdueDay(LocalDate.of(2019, 12, 12))
+                .setOverdueDay(LocalDate.of(2019, 10, 12))
                 .setPrice(100.0)
                 .build();
         Medicine medicine2 = new Medicine.Builder()
                 .setId(5)
                 .setForm("form2")
                 .setName("Name2")
-                .setOverdueDay(LocalDate.of(2019, 12, 12))
+                .setOverdueDay(LocalDate.of(2019, 10, 12))
                 .setPrice(105.0)
                 .build();
         pharmacy = new Pharmacy.Builder()
@@ -67,13 +67,14 @@ public class TestPharmacyDAO {
                 .setMedicine(medicine)
                 .setPharmacy(pharmacy)
                 .build();
+        //new CountMedicineDAO(connection).create(countMedicine1);
         CountMedicine countMedicine2 = new CountMedicine.Builder()
                 .setId(6)
                 .setCount(150)
                 .setMedicine(medicine2)
                 .setPharmacy(pharmacy)
                 .build();
-
+        // new CountMedicineDAO(connection).create(countMedicine2);
         list.add(countMedicine2);
         list.add(countMedicine1);
         pharmacy.setCountMedicines(list);
@@ -87,7 +88,7 @@ public class TestPharmacyDAO {
 
     @AfterTest
     public void after() throws SQLException {
-        new PersonDAO(connection).delete(person);
+      //  new PersonDAO(connection).delete(person);
         connection.close();
     }
 
@@ -116,6 +117,11 @@ public class TestPharmacyDAO {
     @Test
     public void getListCountMedicineTest() throws SQLException {
         assertEquals(pharmacyDAO.getListCountMedicine(pharmacy), list);
+    }
+
+    @Test
+    public void deleteOverdueMedicinesTest() throws SQLException {
+        pharmacyDAO.deleteOverdueMedicines(pharmacy);
     }
 
     @Test
