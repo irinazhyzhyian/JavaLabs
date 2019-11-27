@@ -61,7 +61,8 @@ public class TestPersonDAO {
     public void resultSetToObjTest() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM persons  WHERE id=3");
         ResultSet resultSet = statement.executeQuery();
-        assertEquals(personDAO.resultSetToObj(resultSet), person);
+        if(resultSet.next())
+            assertEquals(personDAO.resultSetToObj(resultSet), person);
     }
 
     @Test

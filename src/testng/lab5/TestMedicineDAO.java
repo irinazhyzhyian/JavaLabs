@@ -60,7 +60,8 @@ public class TestMedicineDAO {
     public void resultSetToObjTest() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM medicines  WHERE id=4");
         ResultSet resultSet = statement.executeQuery();
-        assertEquals(medicineDAO.resultSetToObj(resultSet), medicine);
+        if(resultSet.next())
+            assertEquals(medicineDAO.resultSetToObj(resultSet), medicine);
     }
 
     @Test

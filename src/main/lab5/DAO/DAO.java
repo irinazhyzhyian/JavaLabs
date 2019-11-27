@@ -15,5 +15,5 @@ public interface DAO<T, Key> {
     boolean update(T model) throws SQLException;
     boolean delete(T model) throws SQLException;
 
-    T resultSetToObj(ResultSet rs) throws SQLException;
+    //T resultSetToObj(ResultSet rs) throws SQLException;
 }

@@ -106,7 +106,8 @@ public class TestPharmacyDAO {
     public void resultSetToObjTest() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM pharmacy WHERE id=5");
         ResultSet resultSet = statement.executeQuery();
-        assertEquals(pharmacyDAO.resultSetToObj(resultSet), pharmacy);
+        if(resultSet.next())
+             assertEquals(pharmacyDAO.resultSetToObj(resultSet), pharmacy);
     }
 
     @Test

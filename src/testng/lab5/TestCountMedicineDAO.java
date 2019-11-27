@@ -1,6 +1,7 @@
 package testng.lab5;
 
 import main.lab5.DAO.CountMedicineDAO;
+import main.lab5.DAO.MedicineDAO;
 import main.lab5.database.ConnectionManager;
 import main.lab5.model.CountMedicine;
 import main.lab5.model.Medicine;
@@ -36,6 +37,7 @@ public class TestCountMedicineDAO {
                 .setOverdueDay(LocalDate.of(2019, 12, 12))
                 .setPrice(100.0)
                 .build();
+        new MedicineDAO(connection).create(medicine);
         Pharmacy pharmacy = new Pharmacy.Builder()
                 .setId(1)
                 .setName("Pharmacy #1")
@@ -77,7 +79,8 @@ public class TestCountMedicineDAO {
     public void resultSetToObjTest() throws SQLException {
         PreparedStatement statement = connection.prepareStatement("SELECT * FROM count_medicines  WHERE id=5");
         ResultSet resultSet = statement.executeQuery();
-        assertEquals(countMedicineDAO.resultSetToObj(resultSet), countMedicine);
+        if(resultSet.next())
+             assertEquals(countMedicineDAO.resultSetToObj(resultSet), countMedicine);
     }
 
     @Test

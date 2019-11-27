@@ -13,15 +13,17 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
     /**
      * SQL queries for medicines table.
      */
-    enum PersonSQL {
+    enum MedicineSQL {
         GET("SELECT * FROM medicines  WHERE medicines.id = (?)"),
         INSERT("INSERT INTO medicines (id, name, form, overdue_day, price) VALUES ((?), (?), (?), (?), (?)) RETURNING id"),
         DELETE("DELETE FROM medicines WHERE id = (?) RETURNING id"),
-        UPDATE("UPDATE medicines SET price = (?) WHERE form = (?) RETURNING id");
+        UPDATE("UPDATE medicines SET price = (?) WHERE form = (?) RETURNING id"),
+
+        DELETE_OVERDUE_MEDICINES("DELETE FROM medicines WHERE overdue_day<current_date");
 
         String QUERY;
 
-        PersonSQL(String QUERY) {
+        MedicineSQL(String QUERY) {
             this.QUERY = QUERY;
         }
     }
@@ -50,7 +52,7 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
     public boolean create(Medicine medicine) {
         boolean result = false;
 
-        try (PreparedStatement statement = connection.prepareStatement(PersonSQL.INSERT.QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(MedicineSQL.INSERT.QUERY)) {
             statement.setInt(1, medicine.getId());
             statement.setString(2, medicine.getName());
             statement.setString(3, medicine.getForm());
@@ -74,7 +76,7 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
         final Medicine result = new Medicine();
         result.setId(-1);
 
-        try (PreparedStatement statement = connection.prepareStatement(PersonSQL.GET.QUERY)) {
+        try (PreparedStatement statement = connection.prepareStatement(MedicineSQL.GET.QUERY)) {
             statement.setInt(1, id);
             final ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
@@ -100,7 +102,7 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
     public boolean update(Medicine medicine) {
         boolean result = false;
 
-        try(PreparedStatement statement = connection.prepareStatement(PersonSQL.UPDATE.QUERY)) {
+        try(PreparedStatement statement = connection.prepareStatement(MedicineSQL.UPDATE.QUERY)) {
             statement.setDouble(1, medicine.getPrice());
             statement.setString(2, medicine.getForm());
             result = statement.executeQuery().next();
@@ -120,13 +122,19 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
     public boolean delete(Medicine medicine) {
         boolean result = false;
 
-        try(PreparedStatement statement = connection.prepareStatement(PersonSQL.DELETE.QUERY)) {
+        try(PreparedStatement statement = connection.prepareStatement(MedicineSQL.DELETE.QUERY)) {
             statement.setInt(1, medicine.getId());
             result = statement.executeQuery().next();
         }catch (SQLException e) {
             e.printStackTrace();
         }
         return result;
+    }
+
+    public void deleteWhereOverdue() throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(MedicineSQL.DELETE_OVERDUE_MEDICINES.QUERY);
+        statement.execute();
+        statement.close();
     }
 
     /**
@@ -136,17 +144,14 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
      * @return Medicine object
      * @throws SQLException
      */
-    @Override
     public Medicine resultSetToObj(ResultSet rs) throws SQLException {
         Medicine medicine = new Medicine();
 
-        if(rs.next()) {
             medicine.setId(rs.getInt("id"));
             medicine.setName(rs.getString("name"));
             medicine.setOverdueDay(LocalDate.parse(rs.getDate("overdue_day").toString()));
             medicine.setPrice(rs.getDouble("price"));
             medicine.setForm(rs.getString("form"));
-        }
         return medicine;
     }
 

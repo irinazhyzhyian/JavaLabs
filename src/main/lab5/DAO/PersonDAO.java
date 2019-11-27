@@ -136,17 +136,14 @@ public class  PersonDAO implements DAO<Person, Integer> {
      * @return Person object
      * @throws SQLException
      */
-    @Override
     public Person resultSetToObj(ResultSet rs) throws SQLException {
         Person person = new Person();
-
-        if(rs.next()) {
-            person.setId(rs.getInt("id"));
+         
+        person.setId(rs.getInt("id"));
             person.setFirstName(rs.getString("first_name"));
             person.setLastName(rs.getString("last_name"));
             person.setBirthday(rs.getDate("birthday").toLocalDate());
             person.setSalary(rs.getDouble("salary"));
-        }
 
         return person;
     }

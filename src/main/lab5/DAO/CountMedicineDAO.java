@@ -126,15 +126,13 @@ public class CountMedicineDAO implements DAO<CountMedicine, Integer> {
      * @return CountMedicine object
      * @throws SQLException
      */
-    @Override
     public CountMedicine resultSetToObj(ResultSet rs) throws SQLException {
         CountMedicine count_medicine = new CountMedicine();
-
-        if (rs.next()) {
-            count_medicine.setId(rs.getInt("id"));
-            count_medicine.setCount(rs.getInt("count"));
-            count_medicine.setMedicine(new MedicineDAO(connection).read(rs.getInt("medicine_id")));
-        }
+         
+        count_medicine.setId(rs.getInt("id"));
+        count_medicine.setCount(rs.getInt("count"));
+        count_medicine.setMedicine(new MedicineDAO(connection).read(rs.getInt("medicine_id")));
+        
     return count_medicine;
     }
 

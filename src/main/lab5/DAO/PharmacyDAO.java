@@ -29,7 +29,12 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         GET_OVERDUE_MEDICINES("SELECT medicines.* " +
                 "FROM count_medicines JOIN medicines ON count_medicines.medicine_id=medicines.id "+
                 "JOIN pharmacy ON count_medicines.pharmacy_id=pharmacy.id "+
-                "WHERE pharmacy.id=(?) AND medicines.overdue_day<current_date");
+                "WHERE pharmacy.id=(?) AND medicines.overdue_day<current_date"),
+        DELETE_OVERDUE_MEDICINES_IN_PHARMACY("Delete From medicines "+
+                "WHERE medicines IN(SELECT medicines " +
+                "FROM count_medicines JOIN medicines ON count_medicines.medicine_id=medicines.id "+
+                "JOIN pharmacy ON count_medicines.pharmacy_id=pharmacy.id "+
+                "WHERE pharmacy.id=(?) AND medicines.overdue_day<current_date)");
 
         String QUERY;
 
@@ -136,14 +141,14 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
             statement.setInt(1, pharmacy.getId());
             ResultSet resultSet = statement.executeQuery();
 
-            do {
+            while (resultSet.next()){
                 CountMedicine countMedicine = new CountMedicineDAO(connection).resultSetToObj(resultSet);
                 list.add(countMedicine);
-            } while (!resultSet.isLast());
+            }
         }catch (Exception e) {
             e.getStackTrace();
         }
-        list.forEach(System.out::println);
+        //list.forEach(System.out::println);
         return list;
     }
 
@@ -161,10 +166,10 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
             statement.setInt(1, pharmacy.getId());
             ResultSet resultSet = statement.executeQuery();
 
-            do {
+            while (resultSet.next()) {
                 Medicine medicine = new MedicineDAO(connection).resultSetToObj(resultSet);
                 list.add(medicine);
-            } while (!resultSet.isLast());
+            }
 
             return list;
         }
@@ -177,13 +182,26 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
      * @throws SQLException
      */
     public void deleteOverdueMedicines(Pharmacy pharmacy) throws SQLException {
-        List<Medicine> medicineList = new ArrayList<>();
-        medicineList = getListOfOverdueMedicines(pharmacy);
+        List<Medicine> medicineList = getListOfOverdueMedicines(pharmacy);
 
         for (Medicine medicine: medicineList) {
             new MedicineDAO(connection).delete(medicine);
         }
     }
+
+    /**
+     * Delete all overdue Medicines in Pharmacy by SQL
+     *
+     * @param pharmacy Pharmacy
+     * @throws SQLException
+     */
+    public boolean deleteOverdueMedicinesInPharmacy(Pharmacy pharmacy) throws SQLException {
+        try(PreparedStatement statement = connection.prepareStatement(PharmacySQL.DELETE_OVERDUE_MEDICINES_IN_PHARMACY.QUERY)) {
+            statement.setInt(1,pharmacy.getId());
+            return statement.execute();
+        }
+    }
+
 
     /**
      * Convert ResultSer into Pharmacy Object
@@ -192,16 +210,13 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
      * @return Pharmacy object
      * @throws SQLException
      */
-    @Override
     public Pharmacy resultSetToObj(ResultSet rs) throws SQLException {
         Pharmacy pharmacy = new Pharmacy();
 
-        if(rs.next()) {
             pharmacy.setId(rs.getInt("id"));
             pharmacy.setName(rs.getString("name"));
             pharmacy.setCountMedicines(getListCountMedicine(pharmacy));
             pharmacy.setPharmacist(new PersonDAO(connection).read(rs.getInt("pharmacist_id")));
-        }
 
         return pharmacy;
     }
