@@ -1,16 +1,13 @@
-package main.lab5.DAO;
+package lab5.DAO;
 
-import main.lab5.model.CountMedicine;
-import main.lab5.model.Medicine;
-import main.lab5.model.Person;
-import main.lab5.model.Pharmacy;
-import org.w3c.dom.ls.LSOutput;
+import lab5.model.CountMedicine;
+import lab5.model.Medicine;
+import lab5.model.Pharmacy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -95,7 +92,7 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
             result.setCountMedicines(getListCountMedicine(result));
             result.setName(resultSet.getString("name"));
         }
-        return result;
+         return result;
     }
 
     /**
@@ -127,6 +124,17 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         statement.setInt(1, pharmacy.getId());
 
         return statement.executeQuery().next();
+    }
+
+    public void deleteById(Integer id) {
+        PreparedStatement statement = null;
+        try {
+            statement = Objects.requireNonNull(connection).prepareStatement(PharmacySQL.DELETE.QUERY);
+            statement.setLong(1,id);
+            statement.execute();
+        }catch (SQLException e){
+            e.getStackTrace();
+        }
     }
 
     /**
@@ -188,17 +196,6 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
 
         for (Medicine medicine: medicineList) {
             new MedicineDAO(connection).delete(medicine);
-        }
-    }
-
-    public void deleteById(Integer id) {
-        PreparedStatement statement = null;
-        try {
-            statement = Objects.requireNonNull(connection).prepareStatement(PharmacySQL.DELETE.QUERY);
-            statement.setLong(1,id);
-            statement.execute();
-        }catch (SQLException e){
-            e.getStackTrace();
         }
     }
 

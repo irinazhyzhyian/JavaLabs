@@ -1,0 +1,1 @@
+lab6 is in package lab5

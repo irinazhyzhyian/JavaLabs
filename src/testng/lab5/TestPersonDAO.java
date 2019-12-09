@@ -12,6 +12,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.testng.AssertJUnit.assertEquals;
 
@@ -20,6 +22,7 @@ public class TestPersonDAO {
     private Person person;
     private Person personForUpdate;
     private PersonDAO personDAO;
+    private List<Person> list = new ArrayList<>();
 
     @BeforeTest
     public void before() throws SQLException {
@@ -39,12 +42,21 @@ public class TestPersonDAO {
                 .setLastName("Last name")
                 .setSalary(4000.0)
                 .build();
+        Person person2 = new Person.Builder()
+                .setId(5)
+                .setBirthDay(LocalDate.of(1999, 12, 12))
+                .setFirstName("First name")
+                .setLastName("Last_name")
+                .setSalary(1000.0)
+                .build();
+        list.add(person2);
+        list.add(person);
 
     }
 
     @AfterTest
     public void after() throws SQLException {
-        connection.close();
+      //  connection.close();
     }
 
     @Test
@@ -63,6 +75,11 @@ public class TestPersonDAO {
         ResultSet resultSet = statement.executeQuery();
         if(resultSet.next())
             assertEquals(personDAO.resultSetToObj(resultSet), person);
+    }
+
+    @Test
+    public void findAllTest() throws SQLException {
+        assertEquals(personDAO.findAll(), list);
     }
 
     @Test

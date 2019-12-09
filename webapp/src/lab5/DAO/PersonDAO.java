@@ -1,6 +1,6 @@
-package main.lab5.DAO;
+package lab5.DAO;
 
-import main.lab5.model.Person;
+import lab5.model.Person;
 
 import javax.validation.constraints.NotNull;
 import java.sql.*;
