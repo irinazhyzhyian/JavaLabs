@@ -10,42 +10,29 @@
 <html>
 <head>
     <title>Pharmacy</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/bootstrap.css">
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 </head>
-<body>
-<h1>Pharmacy</h1>
-<h2>Stock</h2>
-<ul>
-</ul>
-<c:forEach items="${countMedicines}" var="countMedicine">
-    <a href="./countMedicine?id=${countMedicine.getId()}">${countMedicine.getMedicine().getName()} count: ${countMedicine.getCount()}</a>
-    <br>
-</c:forEach>
+<body style="padding: 20px">
+<h1>${pharmacy.name}</h1>
+<h2>В аптеці наявні такі ліки:</h2>
 
-<%--<%= request.getAttribute("pharmacies").toString() %>--%>
-
-
-<form>
-   <%-- <input type="hidden" name="action" id="btnId" value="delete"/>--%>
-    <input type="submit" value="delete" onclick="handleDelete()">
-</form>
+<table CELLPADDING="5" border>
+    <tr>
+        <th>Назва медикаменту</th>
+        <th>Кількість</th>
+    </tr>
+    <c:forEach items="${countMedicines}" var="countMedicine">
+        <tr>
+            <td><a href="./countMedicine?id=${countMedicine.id}">${countMedicine.medicine.name}</a></td>
+            <td>${countMedicine.count}</td>
+        </tr>
+    </c:forEach>
+</table>
 <br>
-<script type="text/javascript">
-    function handleDelete(clickedId)
-    {
-        var url = "http://localhost:8000/Gradle___untitled_1_0_SNAPSHOT_war/pharmacy?id=" + clickedId;
-        var xhr = new XMLHttpRequest();
-        var del = confirm("Do you wanna delete?");
-        if (del === true){
-            xhr.open("DELETE", url, del);
-        }
-        xhr.onload = function () {
-            document.location.reload();
-        };
-        xhr.send(null);
-    }
-    function handleUpdate(clickedId) {
-        window.location.href = "http://localhost:8080/parser-resume/address?updateId="+clickedId;
-    }
-</script>
+<form method="post">
+    <button value="deletePharmacy" class="btn btn-primary">Видалити аптеку</button>
+</form>
+
 </body>
 </html>

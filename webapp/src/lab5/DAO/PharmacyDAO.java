@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class PharmacyDAO implements DAO<Pharmacy, Integer> {
 
@@ -126,15 +125,11 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
         return statement.executeQuery().next();
     }
 
-    public void deleteById(Integer id) {
-        PreparedStatement statement = null;
-        try {
-            statement = Objects.requireNonNull(connection).prepareStatement(PharmacySQL.DELETE.QUERY);
-            statement.setLong(1,id);
-            statement.execute();
-        }catch (SQLException e){
-            e.getStackTrace();
-        }
+    public boolean deleteById(Integer id) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(PharmacySQL.DELETE.QUERY);
+        statement.setInt(1, id);
+
+        return statement.executeQuery().next();
     }
 
     /**
@@ -149,6 +144,24 @@ public class PharmacyDAO implements DAO<Pharmacy, Integer> {
 
         try( PreparedStatement statement = connection.prepareStatement(PharmacySQL.GET_COUNT_MED_LIST.QUERY)) {
             statement.setInt(1, pharmacy.getId());
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()){
+                CountMedicine countMedicine = new CountMedicineDAO(connection).resultSetToObj(resultSet);
+                list.add(countMedicine);
+            }
+        }catch (Exception e) {
+            e.getStackTrace();
+        }
+        //list.forEach(System.out::println);
+        return list;
+    }
+
+    public List<CountMedicine> getListCountMedicine(Integer id) throws SQLException {
+        List<CountMedicine> list = new ArrayList<>();
+
+        try( PreparedStatement statement = connection.prepareStatement(PharmacySQL.GET_COUNT_MED_LIST.QUERY)) {
+            statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()){

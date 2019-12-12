@@ -9,17 +9,34 @@
 <html>
 <head>
     <title>Pharmacist</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
-<body>
-<h1>Pharmacist</h1>
-<p>First name: ${person.getFirstName()}</p>
+<body style="padding: 20px">
+<div>
+    <h1>Фармацевт</h1>
+    <table border="2">
+        <tr>
+            <th>Iм'я </th>
+            <td>${person.getFirstName()}</td>
+        </tr>
+        <tr>
+            <th>Прізвище </th>
+            <td>${person.getLastName()}</td>
+        </tr>
+        <tr>
+            <th>Дата народження </th>
+            <td>${person.getBirthday()}</td>
+        </tr>
+        <tr>
+            <th>Заробітня плата</th>
+            <td> ${person.getSalary()}</td>
+        </tr>
+    </table>
+</div>
 <br>
-<p>Last name: ${person.getLastName()}</p>
-<br>
-<p>Birthday: ${person.getBirthday()}</p>
-<br>
-<p>Salary: ${person.getSalary()}</p>
-
-
+<form method="post">
+    <button value="deletePharmacy" class="btn btn-primary">Видалити працівника</button>
+</form>
 </body>
 </html>

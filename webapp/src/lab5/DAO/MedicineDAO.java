@@ -5,6 +5,8 @@ import lab5.model.Medicine;
 import javax.validation.constraints.NotNull;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MedicineDAO implements DAO<Medicine, Integer> {
 
@@ -17,7 +19,8 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
         DELETE("DELETE FROM medicines WHERE id = (?) RETURNING id"),
         UPDATE("UPDATE medicines SET price = (?) WHERE form = (?) RETURNING id"),
 
-        DELETE_OVERDUE_MEDICINES("DELETE FROM medicines WHERE overdue_day<current_date");
+        DELETE_OVERDUE_MEDICINES("DELETE FROM medicines WHERE overdue_day<current_date"),
+        GET_ALL("SELECT * FROM medicines");
 
         String QUERY;
 
@@ -129,6 +132,18 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
         return result;
     }
 
+    public boolean deleteById(Integer id) {
+        boolean result = false;
+
+        try(PreparedStatement statement = connection.prepareStatement(MedicineSQL.DELETE.QUERY)) {
+            statement.setInt(1, id);
+            result = statement.executeQuery().next();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     public void deleteWhereOverdue() throws SQLException {
         PreparedStatement statement = connection.prepareStatement(MedicineSQL.DELETE_OVERDUE_MEDICINES.QUERY);
         statement.execute();
@@ -151,6 +166,19 @@ public class MedicineDAO implements DAO<Medicine, Integer> {
             medicine.setPrice(rs.getDouble("price"));
             medicine.setForm(rs.getString("form"));
         return medicine;
+    }
+
+    public List<Medicine> findAll() throws SQLException {
+        List<Medicine> list = new ArrayList<>();
+        try(PreparedStatement statement = connection.prepareStatement(MedicineSQL.GET_ALL.QUERY)) {
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()){
+                Medicine medicine = resultSetToObj(resultSet);
+                list.add(medicine);
+            }
+            return list;
+        }
     }
 
 }

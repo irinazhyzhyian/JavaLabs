@@ -116,6 +116,13 @@ public class CountMedicineDAO implements DAO<CountMedicine, Integer> {
         }
     }
 
+    public boolean deleteById(Integer id) throws SQLException {
+        try(PreparedStatement statement = connection.prepareStatement(CountMedicineSQL.DELETE.QUERY)) {
+            statement.setInt(1, id);
+            return statement.executeQuery().next();
+        }
+    }
+
     /**
      * Convert ResultSent into CountMedicine
      *

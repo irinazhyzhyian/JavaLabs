@@ -132,6 +132,18 @@ public class  PersonDAO implements DAO<Person, Integer> {
         return result;
     }
 
+    public boolean deleteById(Integer id) {
+        boolean result = false;
+
+        try(PreparedStatement statement = connection.prepareStatement(PersonSQL.DELETE.QUERY)) {
+            statement.setInt(1, id);
+            result = statement.executeQuery().next();
+        }catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
     /**
      * Convert ResultSet into Person
      *

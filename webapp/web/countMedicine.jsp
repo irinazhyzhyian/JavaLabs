@@ -9,15 +9,34 @@
 <html>
 <head>
     <title>medicine</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
-<body>
-<h1>Medicine</h1>
-   <p>Name: ${medicine.getName()}</p>
-    <br>
-   <p>Form: ${medicine.getForm()}</p>
-    <br>
-    <p>Overdue day: ${medicine.getOverdueDay()}</p>
-    <br>
-    <p>Price: ${medicine.getPrice()}</p>
+<body style="padding: 20px">
+<div>
+<h1>Лікарський препарат</h1>
+    <table border="2">
+   <tr>
+       <th>Назва: </th>
+       <td>${medicine.getName()}</td>
+   </tr>
+   <tr>
+       <th>Лікарська форма: </th>
+       <td>${medicine.getForm()}</td>
+   </tr>
+    <tr>
+        <th>Придатний до: </th>
+        <td>${medicine.getOverdueDay()}</td>
+    </tr>
+    <tr>
+        <th>Ціна: </th>
+        <td>${medicine.getPrice()}</td>
+    </tr>
+    </table>
+</div>
+<br>
+<form method="post">
+    <button value="deleteMedicine" class="btn btn-primary">Видалити медикамент</button>
+</form>
 </body>
 </html>

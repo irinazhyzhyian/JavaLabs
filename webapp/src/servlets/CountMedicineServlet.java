@@ -1,9 +1,9 @@
 package servlets;
 
-import lab5.DAO.CountMedicineDAO;
-import lab5.database.ConnectionManager;
-import lab5.model.CountMedicine;
+import dto.CountMedicineDTO;
+import exception.ServiceException;
 import lab5.model.Medicine;
+import service.CountMedicineService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 @WebServlet(urlPatterns = "/countMedicine")
 public class CountMedicineServlet extends HttpServlet {
@@ -22,6 +20,7 @@ public class CountMedicineServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
         String rawId = req.getParameter("id");
+        String rawMedId = req.getParameter("medicine_id");
         if (rawId != null) {
             Integer id = null;
 
@@ -31,19 +30,45 @@ public class CountMedicineServlet extends HttpServlet {
             }
 
             if (id != null) {
-                try (Connection connection = ConnectionManager.getConnection()) {
+                CountMedicineDTO countMedicineDTO;
+                try {
+                    CountMedicineService countMedicine = new CountMedicineService();
+                    countMedicineDTO = countMedicine.findById(id);
+                    if(countMedicineDTO==null) {
+                        resp.sendRedirect("./");
+                        return;
+                    }
 
-                    CountMedicineDAO countMedicineDAO = new CountMedicineDAO(connection);
-                    CountMedicine countMedicine = countMedicineDAO.read(id);
-                    Medicine medicine = countMedicine.getMedicine();
+                    Medicine medicine = countMedicineDTO.getMedicine();
 
                     req.setAttribute("medicine", medicine);
-                } catch (SQLException e) {
+                } catch (ServiceException e) {
                     e.printStackTrace();
                 }
                 RequestDispatcher requestDispatcher = req.getRequestDispatcher("countMedicine.jsp");
                 requestDispatcher.forward(req, resp);
             }
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        req.setCharacterEncoding("UTF-8");
+        String rawId = req.getParameter("id");
+        if (rawId != null) {
+            Integer id = null;
+
+            try {
+                id = Integer.parseInt(rawId);
+            } catch (Exception ignored) {
+            }
+            try {
+                CountMedicineService service = new CountMedicineService();
+                service.delete(id);
+            } catch (ServiceException e) {
+                e.printStackTrace();
+            }
+            resp.sendRedirect("./");
         }
     }
 }

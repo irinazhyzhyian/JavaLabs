@@ -1,8 +1,8 @@
 package servlets;
 
-import lab5.DAO.PersonDAO;
-import lab5.database.ConnectionManager;
-import lab5.model.Person;
+import dto.PersonDTO;
+import exception.ServiceException;
+import service.PersonService;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -11,8 +11,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
 
 @WebServlet(urlPatterns = "/person")
 public class PersonServlet extends HttpServlet {
@@ -30,14 +28,19 @@ public class PersonServlet extends HttpServlet {
             }
 
             if (id != null) {
-                try (Connection connection = ConnectionManager.getConnection()) {
+                PersonDTO personDTO;
+                try {
+                    PersonService person = new PersonService();
+                    personDTO = person.findById(id);
 
-                    PersonDAO personDAO = new PersonDAO(connection);
+                    if(personDTO==null) {
+                        resp.sendRedirect("./");
+                        return;
+                    }
 
-                    Person person = personDAO.read(id);
 
-                    req.setAttribute("person", person);
-                } catch (SQLException e) {
+                    req.setAttribute("person", personDTO);
+                } catch (ServiceException e) {
                     e.printStackTrace();
                 }
                 RequestDispatcher requestDispatcher = req.getRequestDispatcher("person.jsp");
@@ -45,4 +48,26 @@ public class PersonServlet extends HttpServlet {
             }
         }
     }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        req.setCharacterEncoding("UTF-8");
+        String rawId = req.getParameter("id");
+        if (rawId != null) {
+            Integer id = null;
+
+            try {
+                id = Integer.parseInt(rawId);
+            } catch (Exception ignored) {
+            }
+            try {
+                PersonService service = new PersonService();
+                service.delete(id);
+            } catch (ServiceException e) {
+                e.printStackTrace();
+            }
+            resp.sendRedirect("./");
+        }
+    }
+
 }
